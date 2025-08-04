@@ -5,7 +5,7 @@ import dotenv from "dotenv";
 dotenv.config();
 
 const CUIT = 20956569592;
-const PRODUCTION = true;
+const PRODUCTION = false;
 
 function getAuth() {
   const PATH = PRODUCTION ? "prod/" : "dev/";
@@ -27,27 +27,20 @@ const config = {
 
 const afip = new Afip(config);
 
-// Periodo del CAEA. (yyyymm)
-const periodo = 202506;
+const ws = afip.WebService("wsfex");
 
-// Orden del CAEA dentro del periodo. Quincena 1, Quincena 2
-const orden = 1;
+// Obtenemos el TA
+const ta = await ws.getTokenAuthorization();
 
-const caeaInfo = await afip.ElectronicBilling.getCAEA(periodo, orden);
-// const ws = afip.WebService("wsfex");
+// Preparamos los datos
+const data = {
+  Auth: {
+    Token: ta.token,
+    Sign: ta.sign,
+    Cuit: afip.CUIT,
+  },
+};
 
-// // Obtenemos el TA
-// const ta = await ws.getTokenAuthorization();
+const res = await ws.executeRequest("FEXGetLast_ID", data);
 
-// // Preparamos los datos
-// const data = {
-//   Auth: {
-//     Token: ta.token,
-//     Sign: ta.sign,
-//     Cuit: afip.CUIT,
-//   },
-// };
-
-// const res = await ws.executeRequest("FEXGetLast_ID", data);
-
-console.log(caeaInfo);
+console.log(res);
