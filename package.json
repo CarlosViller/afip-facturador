@@ -1,0 +1,5 @@
+{
+  "dependencies": {
+    "@afipsdk/afip.js": "^1.1.3"
+  }
+}
